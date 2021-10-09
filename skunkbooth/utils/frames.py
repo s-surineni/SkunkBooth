@@ -64,7 +64,9 @@ class MainFrame(Frame):
         self._effects_button = Button(_("🖌 Effects"), self._filters, add_box=True)
         self._camera_button = Button(_("📷 Shoot"), self._shoot, add_box=True)
         self._settings_button = Button(_("🔧 Settings"), self._settings, add_box=True)
+        # self._video_recording = CheckBox(_("⏯︎ Record"), on_change=self._record(toggle))
         self._video_recording = CheckBox(_("⏯︎ Record"), on_change=toggle)
+        self._video_length = Label("00:00")
         self._quit_button = Button(_("🛑 Quit"), self._quit, add_box=True)
 
         box = Box(screen.width, screen.height, uni=True)
@@ -83,7 +85,7 @@ class MainFrame(Frame):
 
         self.add_effect(camera_effect)
 
-        controls_layout = Layout([1, 1, 1, 1, 1, 1])
+        controls_layout = Layout([1, 1, 1, 1, 1, 1, 1])
         self.add_layout(controls_layout)
         controls_layout.add_widget(self._gallery_button, 0)
         controls_layout.add_widget(self._video_recording, 1)
@@ -91,6 +93,7 @@ class MainFrame(Frame):
         controls_layout.add_widget(self._effects_button, 3)
         controls_layout.add_widget(self._settings_button, 4)
         controls_layout.add_widget(self._quit_button, 5)
+        controls_layout.add_widget(self._video_length, 6)
         self.set_theme("bright")
         self.fix()
         self.webcam = webcam
@@ -108,6 +111,14 @@ class MainFrame(Frame):
         """Open gallery"""
         logging.debug("Gallery was clicked")
         raise NextScene("Gallery")
+
+
+    def _record(self, toggle) -> None:
+        """Record video"""
+        logging.debug("Started recording video")
+        # toggle()
+        self._video_length.text = "Recording..."
+        raise NextScene("Record")
 
     # @staticmethod
     def _shoot(self) -> None:

@@ -60,6 +60,7 @@ def main() -> None:
             vidBuf.put(VID_FILE)
         else:
             logging.info("Recording stopped.")
+        return flag[0]
 
     TOP_MARGIN = 4
     image_selection = ImageSelectionModel()
