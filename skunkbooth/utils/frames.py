@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from functools import partial
 from gettext import translation
 from typing import Any, Callable
 
@@ -64,8 +65,8 @@ class MainFrame(Frame):
         self._effects_button = Button(_("🖌 Effects"), self._filters, add_box=True)
         self._camera_button = Button(_("📷 Shoot"), self._shoot, add_box=True)
         self._settings_button = Button(_("🔧 Settings"), self._settings, add_box=True)
-        # self._video_recording = CheckBox(_("⏯︎ Record"), on_change=self._record(toggle))
-        self._video_recording = CheckBox(_("⏯︎ Record"), on_change=toggle)
+        self._video_recording = CheckBox(_("⏯︎ Record"), on_change=partial(self._record, toggle))
+        # self._video_recording = CheckBox(_("⏯︎ Record"), on_change=toggle)
         self._video_length = Label("00:00")
         self._quit_button = Button(_("🛑 Quit"), self._quit, add_box=True)
 
@@ -113,12 +114,18 @@ class MainFrame(Frame):
         raise NextScene("Gallery")
 
 
+    # def _update_time(self):
+
     def _record(self, toggle) -> None:
         """Record video"""
         logging.debug("Started recording video")
-        # toggle()
-        self._video_length.text = "Recording..."
-        raise NextScene("Record")
+        res = toggle()
+        if res:
+
+            self._video_length.text = "Recording..."
+        else:
+            self._video_length.text = "Waiting..."
+        # raise NextScene("Record")
 
     # @staticmethod
     def _shoot(self) -> None:
