@@ -48,7 +48,7 @@ def main() -> None:
     vid = Process(target=videoManager, args=[vidBuf])
     vid.start()
 
-    def toggleFlag(flag: List[int]) -> None:
+    def toggleFlag(flag: List[int]) -> int:
         """Temp function for toggling video recording from inside screen"""
         flag[0] = not flag[0]
         # re-initialize VideoIO for new file name

@@ -1,4 +1,6 @@
 import logging
+import threading
+import time
 from datetime import datetime
 from functools import partial
 from gettext import translation
@@ -61,6 +63,7 @@ class MainFrame(Frame):
             reduce_cpu=True,
         )
         # Made the labels below short so as to fit small screens
+        self._timer_event = threading.Event()
         self._gallery_button = Button(_("🖼 Gallery"), self._gallery, add_box=True)
         self._effects_button = Button(_("🖌 Effects"), self._filters, add_box=True)
         self._camera_button = Button(_("📷 Shoot"), self._shoot, add_box=True)
@@ -114,16 +117,33 @@ class MainFrame(Frame):
         raise NextScene("Gallery")
 
 
-    # def _update_time(self):
+    def _update_time(self, event):
+        start = 0
+        lenth_format = '{min}:{sec}'
+        while not event.isSet():
+            start += 1
+            sec = start % 60
+            min = start // 60
+            self._video_length.text = lenth_format.format(min=min, sec=sec)
+            time.sleep(1)
+            logging.info('*' * 80)
+            logging.info('ironman threading.currentThread().ident {threading}'.format(threading=threading.currentThread().ident))
 
     def _record(self, toggle) -> None:
         """Record video"""
         logging.debug("Started recording video")
         res = toggle()
+        logging.info('*' * 80)
+        logging.info('ironman {res}'.format(res=res))
+        time_thread = None
         if res:
-
+            self._timer_event.clear()
+            time_thread = threading.Thread(target=self._update_time, args=(self._timer_event,))
+            time_thread.start()
             self._video_length.text = "Recording..."
         else:
+            self._timer_event.set()
+
             self._video_length.text = "Waiting..."
         # raise NextScene("Record")
 
