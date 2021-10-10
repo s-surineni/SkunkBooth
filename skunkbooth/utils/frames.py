@@ -69,7 +69,6 @@ class MainFrame(Frame):
         self._camera_button = Button(_("📷 Shoot"), self._shoot, add_box=True)
         self._settings_button = Button(_("🔧 Settings"), self._settings, add_box=True)
         self._video_recording = CheckBox(_("⏯︎ Record"), on_change=partial(self._record, toggle))
-        # self._video_recording = CheckBox(_("⏯︎ Record"), on_change=toggle)
         self._video_length = Label("00:00")
         self._quit_button = Button(_("🛑 Quit"), self._quit, add_box=True)
 
@@ -93,11 +92,11 @@ class MainFrame(Frame):
         self.add_layout(controls_layout)
         controls_layout.add_widget(self._gallery_button, 0)
         controls_layout.add_widget(self._video_recording, 1)
-        controls_layout.add_widget(self._camera_button, 2)
-        controls_layout.add_widget(self._effects_button, 3)
-        controls_layout.add_widget(self._settings_button, 4)
-        controls_layout.add_widget(self._quit_button, 5)
-        controls_layout.add_widget(self._video_length, 6)
+        controls_layout.add_widget(self._video_length, 2)
+        controls_layout.add_widget(self._camera_button, 3)
+        controls_layout.add_widget(self._effects_button, 4)
+        controls_layout.add_widget(self._settings_button, 5)
+        controls_layout.add_widget(self._quit_button, 6)
         self.set_theme("bright")
         self.fix()
         self.webcam = webcam
@@ -116,36 +115,27 @@ class MainFrame(Frame):
         logging.debug("Gallery was clicked")
         raise NextScene("Gallery")
 
-
     def _update_time(self, event):
         start = 0
-        lenth_format = '{min}:{sec}'
+        length_format = '{min}:{sec}'
         while not event.isSet():
             start += 1
             sec = start % 60
-            min = start // 60
-            self._video_length.text = lenth_format.format(min=min, sec=sec)
+            minutes = start // 60
+            self._video_length.text = length_format.format(min=minutes, sec=sec)
             time.sleep(1)
-            logging.info('*' * 80)
-            logging.info('ironman threading.currentThread().ident {threading}'.format(threading=threading.currentThread().ident))
 
     def _record(self, toggle) -> None:
         """Record video"""
         logging.debug("Started recording video")
         res = toggle()
-        logging.info('*' * 80)
-        logging.info('ironman {res}'.format(res=res))
-        time_thread = None
         if res:
             self._timer_event.clear()
-            time_thread = threading.Thread(target=self._update_time, args=(self._timer_event,))
-            time_thread.start()
-            self._video_length.text = "Recording..."
+            threading.Thread(target=self._update_time, args=(self._timer_event,)).start()
         else:
             self._timer_event.set()
+            self._video_length.text = "00:00"
 
-            self._video_length.text = "Waiting..."
-        # raise NextScene("Record")
 
     # @staticmethod
     def _shoot(self) -> None:
